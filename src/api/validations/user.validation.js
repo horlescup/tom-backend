@@ -8,8 +8,8 @@ module.exports = {
     query: {
       page: Joi.number().min(1),
       perPage: Joi.number().min(1).max(100),
-      name: Joi.string(),
-      email: Joi.string(),
+      name: Joi.string().optional().allow(''),
+      email: Joi.string().optional().allow(''),
       role: Joi.string().valid(User.roles),
     },
   },

@@ -91,7 +91,7 @@ userSchema.pre('save', async function save(next) {
 userSchema.method({
   transform() {
     const transformed = {};
-    const fields = ['id', 'username', 'firstName', 'lastName', 'email', 'role', 'createdAt'];
+    const fields = ['id', 'username', 'firstName', 'lastName', 'email', 'role', 'active', 'createdAt'];
 
     fields.forEach((field) => {
       transformed[field] = this[field];
@@ -190,7 +190,39 @@ userSchema.statics = {
   list({
     page = 1, perPage = 30, name, email, role,
   }) {
-    const options = omitBy({ name, email, role }, isNil);
+    const options = omitBy({ email, role }, isNil);
+
+    if (name) {
+      const nameSplits = name.split(' ').filter(Boolean);
+
+      if (nameSplits.length === 1) {
+        options['$or'] = [
+          {
+            firstName: {
+              $regex: new RegExp(nameSplits[0], 'i')
+            }
+          },
+          {
+            lastName: {
+              $regex: new RegExp(nameSplits[0], 'i')
+            }
+          }
+        ];
+      } else {
+        options['$and'] = [
+          {
+            firstName: {
+              $regex: new RegExp(nameSplits[0], 'i')
+            }
+          },
+          {
+            lastName: {
+              $regex: new RegExp(nameSplits[1], 'i')
+            }
+          }
+        ];
+      }
+    }
 
     return this.find(options)
       .sort({ createdAt: -1 })
