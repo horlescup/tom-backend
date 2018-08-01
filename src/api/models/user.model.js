@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate');
 const httpStatus = require('http-status');
 const { omitBy, isNil } = require('lodash');
 const bcrypt = require('bcryptjs');
@@ -183,20 +184,23 @@ userSchema.statics = {
   /**
    * List users in descending order of 'createdAt' timestamp.
    *
-   * @param {number} skip - Number of users to be skipped.
+   * @param {number} page - The page number.
    * @param {number} limit - Limit number of users to be returned.
    * @returns {Promise<User[]>}
    */
   list({
-    page = 1, perPage = 30, name, email, role,
+    page = 1, limit = 10, name, email, role,
   }) {
-    const options = omitBy({ email, role }, isNil);
+    const query = omitBy({ email, role }, isNil);
+
+    page = Number(page);
+    limit = Number(limit);
 
     if (name) {
       const nameSplits = name.split(' ').filter(Boolean);
 
       if (nameSplits.length === 1) {
-        options['$or'] = [
+        query['$or'] = [
           {
             firstName: {
               $regex: new RegExp(nameSplits[0], 'i')
@@ -209,7 +213,7 @@ userSchema.statics = {
           }
         ];
       } else {
-        options['$and'] = [
+        query['$and'] = [
           {
             firstName: {
               $regex: new RegExp(nameSplits[0], 'i')
@@ -224,11 +228,7 @@ userSchema.statics = {
       }
     }
 
-    return this.find(options)
-      .sort({ createdAt: -1 })
-      .skip(perPage * (page - 1))
-      .limit(perPage)
-      .exec();
+    return this.paginate(query, { page, limit });
   },
 
   /**
@@ -265,6 +265,8 @@ userSchema.statics = {
     return error;
   },
 };
+
+userSchema.plugin(mongoosePaginate);
 
 /**
  * @typedef User
