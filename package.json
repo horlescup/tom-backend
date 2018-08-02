@@ -76,6 +76,7 @@
     "method-override": "^2.3.8",
     "moment-timezone": "^0.5.13",
     "mongoose": "^4.9.7",
+    "mongoose-paginate": "^5.0.3",
     "morgan": "^1.8.1",
     "nodemailer": "^4.6.7",
     "nodemailer-express-handlebars": "^3.0.0",

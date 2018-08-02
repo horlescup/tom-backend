@@ -88,7 +88,7 @@ exports.resetPassword = async (req, res, next) => {
   let token = crypto.randomBytes(20).toString('hex'),
     data = {
       to: user.email,
-      from: 'Kapamed <kapamedtest@gmail.com>',
+      from: 'TomApp <petrica.horlescu13@gmail.com>',
       template: 'reset-password',
       subject: 'Reset password',
       context: {
@@ -101,6 +101,32 @@ exports.resetPassword = async (req, res, next) => {
 
   await transporter.sendMail(data);
   await user.save();
+
+  res.send({success: true});
+};
+
+/**
+ * Set new password
+ * @public
+ */
+exports.setPassword = async (req, res, next) => {
+  const user = await User.findUser({ reset_password_token: req.body.token });
+  if (!user) {
+    let err = new APIError({
+      message: 'Invalid token or already used!',
+      status: httpStatus.BAD_REQUEST,
+    });
+    return next(err);
+  }
+
+  await user.update({
+    $set: {
+      password: req.body.password
+    },
+    $unset: {
+      reset_password_token: 1
+    }
+  });
 
   res.send({success: true});
 };

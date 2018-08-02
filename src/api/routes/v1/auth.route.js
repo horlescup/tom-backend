@@ -5,7 +5,8 @@ const {
   login,
   register,
   refresh,
-  resetPassword
+  resetPassword,
+  setPassword
 } = require('../../validations/auth.validation');
 
 const router = express.Router();
@@ -96,7 +97,7 @@ router.route('/refresh-token')
 
 
 /**
- * @api {post} v1/auth/refresh-token Refresh Token
+ * @api {post} v1/auth/reset-password Send reset password
  * @apiDescription Refresh expired accessToken
  * @apiVersion 1.0.0
  * @apiName RefreshToken
@@ -116,6 +117,28 @@ router.route('/refresh-token')
  */
 router.route('/reset-password')
   .post(validate(resetPassword), controller.resetPassword);
+
+/**
+ * @api {put} v1/auth/set-password Set new password
+ * @apiDescription Refresh expired accessToken
+ * @apiVersion 1.0.0
+ * @apiName RefreshToken
+ * @apiGroup Auth
+ * @apiPermission public
+ *
+ * @apiParam  {String}  email         User's email
+ * @apiParam  {String}  refreshToken  Refresh token aquired when user logged in
+ *
+ * @apiSuccess {String}  tokenType     Access Token's type
+ * @apiSuccess {String}  accessToken   Authorization Token
+ * @apiSuccess {String}  refreshToken  Token to get a new accessToken after expiration time
+ * @apiSuccess {Number}  expiresIn     Access Token's expiration time in miliseconds
+ *
+ * @apiError (Bad Request 400)  ValidationError  Some parameters may contain invalid values
+ * @apiError (Unauthorized 401)  Unauthorized     Incorrect email or refreshToken
+ */
+router.route('/set-password')
+  .put(validate(setPassword), controller.setPassword);
 
 
 module.exports = router;
