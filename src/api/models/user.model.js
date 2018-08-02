@@ -86,6 +86,25 @@ userSchema.pre('save', async function save(next) {
   }
 });
 
+userSchema.pre('update', async function (next) {
+  let update = this._update.$set;
+
+  if (!update || !update.password) {
+    return next();
+  }
+
+  try {
+    const rounds = env === 'test' ? 1 : 10;
+
+    const hash = await bcrypt.hash(update.password, rounds);
+    update.password = hash;
+
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+});
+
 /**
  * Methods
  */

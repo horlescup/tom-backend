@@ -31,4 +31,12 @@ module.exports = {
       email: Joi.string().email().required()
     },
   },
+
+  // PUT /v1/auth/set-password
+  setPassword: {
+    body: {
+      token: Joi.string().required(),
+      password: Joi.string().required()
+    },
+  },
 };
