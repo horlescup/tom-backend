@@ -91,6 +91,28 @@ router
    */
   .get(authorize(), controller.loggedIn);
 
+router
+  .route('/check')
+  /**
+   * @api {post} v1/users/check Check user
+   * @apiDescription Check if user with given email exits
+   * @apiVersion 1.0.0
+   * @apiName UserCheck
+   * @apiGroup User
+   * @apiPermission user
+   *
+   * @apiHeader {String} Athorization  User's access token
+   *
+   * @apiSuccess {String}  id         User's id
+   * @apiSuccess {String}  name       User's name
+   * @apiSuccess {String}  email      User's email
+   * @apiSuccess {String}  role       User's role
+   * @apiSuccess {Date}    createdAt  Timestamp
+   *
+   * @apiError (Unauthorized 401)  Unauthorized  Only authenticated Users can access the data
+   */
+  .post(controller.check);
+
 
 router
   .route('/:userId')
