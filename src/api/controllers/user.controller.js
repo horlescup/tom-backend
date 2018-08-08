@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const { omit } = require('lodash');
+const APIError = require('../utils/APIError');
 const User = require('../models/user.model');
 const { handler: errorHandler } = require('../middlewares/error');
 
@@ -102,4 +103,22 @@ exports.remove = (req, res, next) => {
   user.remove()
     .then(() => res.status(httpStatus.NO_CONTENT).end())
     .catch(e => next(e));
+};
+
+/**
+ * Check user
+ * @public
+ */
+exports.check = async (req, res, next) => {
+  const user = await User.findUser({email: req.body.email});
+
+  if (!user) {
+    let err = new APIError({
+      message: "We couldn't find an account with that email.",
+      status: httpStatus.BAD_REQUEST,
+    });
+    return next(err);
+  }
+
+  res.send({success: true});
 };
